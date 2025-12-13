@@ -1,0 +1,6 @@
+# --- Environment Variables (Security) ---
+# 秘密鍵などが含まれるため絶対にコミットしない
+.env
+.env.*
+!.env.example
+!.env.template

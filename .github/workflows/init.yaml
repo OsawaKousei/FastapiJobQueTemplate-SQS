@@ -1,0 +1,79 @@
+name: Initialize Repository
+
+# リポジトリへのプッシュ時に発火
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  initialize:
+    # テンプレートリポジトリ自体では実行しないガード条件
+    if: github.repository != 'OsawaKousei/FastapiTemplate'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 初回のコミット（テンプレートからの生成直後）であるかを判定
+      - name: Check if initialization is needed
+        id: check_init
+        run: |
+          commit_count=$(git rev-list --count HEAD)
+          if [ "$commit_count" -le 2 ]; then
+            echo "run_init=true" >> $GITHUB_OUTPUT
+          else
+            echo "run_init=false" >> $GITHUB_OUTPUT
+          fi
+
+      # pyproject.toml の name を書き換え
+      - name: Update app/pyproject.toml
+        if: steps.check_init.outputs.run_init == 'true'
+        run: |
+          REPO_NAME=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+
+          # appディレクトリ内のpyproject.tomlを対象にする
+          cd app
+          # name = "app" を name = "リポジトリ名" に置換
+          sed -i "s/^name = \"app\"/name = \"${REPO_NAME}\"/" pyproject.toml
+            
+          echo "Updated app/pyproject.toml name to $REPO_NAME"
+
+      # docker-compose.yaml の volume名とサービス名を書き換え
+      - name: Update docker-compose.yaml
+        if: steps.check_init.outputs.run_init == 'true'
+        run: |
+          REPO_NAME=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+
+          # サービス名の変更
+          sed -i "s/^  app:/  ${REPO_NAME}:/" docker-compose.yaml
+          sed -i "s/^  dynamodb:/  ${REPO_NAME}-dynamodb:/" docker-compose.yaml
+          sed -i "s/^  postgres:/  ${REPO_NAME}-postgres:/" docker-compose.yaml
+
+          # ボリューム名の変更
+          sed -i "s/app-dynamodb-data/${REPO_NAME}-dynamodb-data/g" docker-compose.yaml
+          sed -i "s/app-postgres-data/${REPO_NAME}-postgres-data/g" docker-compose.yaml
+          sed -i "s/app-python-packages/${REPO_NAME}-python-packages/g" docker-compose.yaml
+
+          echo "Updated docker-compose.yaml service and volume names"
+
+      # このワークフローファイル自身を削除
+      - name: Remove initialization workflow
+        if: steps.check_init.outputs.run_init == 'true'
+        run: |
+          git rm .github/workflows/init.yaml
+
+      # 変更をまとめてコミット＆プッシュ
+      - name: Commit and push changes
+        if: steps.check_init.outputs.run_init == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: initialize repository (update project name)"
+          branch: main
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"

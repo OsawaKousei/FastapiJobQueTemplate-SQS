@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "oderwat.indent-rainbow",
+    "ms-azuretools.vscode-docker",
+    "esbenp.prettier-vscode",
+    "redhat.vscode-yaml",
+    "exiasr.hadolint"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  // Mypyの設定はここには書かず、pyproject.tomlを参照させる
+  "mypy-type-checker.args": [
+    "--config-file=${workspaceFolder}/pyproject.toml"
+  ],
+  // エラーは厳格に「Error」として表示する（デフォルトがErrorなので設定不要、もしくは以下）
+  "mypy-type-checker.severity": {
+    "error": "Error",
+    "note": "Information"
+  },
+  // ワークスペース全体をチェック対象にする（follow-imports=skipの逆）
+  "mypy-type-checker.reportingScope": "workspace"
+}
