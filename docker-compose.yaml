@@ -31,8 +31,8 @@ services:
       - DEBUG=1
       - AWS_DEFAULT_REGION=ap-northeast-1
       - DOCKER_HOST=unix:///var/run/docker.sock
-      # Lambda起動時にホストの ./app を /var/task/app にマウントする
-      - LAMBDA_DOCKER_FLAGS=-v ${PWD}/app:/var/task/app
+      # Lambda起動時にホストの ./app を /var/task にマウントする
+      - LAMBDA_DOCKER_FLAGS=-v ${PWD}/app:/var/task
     volumes:
       # Docker in Docker (Lambdaコンテナ起動用)
       - "/var/run/docker.sock:/var/run/docker.sock"

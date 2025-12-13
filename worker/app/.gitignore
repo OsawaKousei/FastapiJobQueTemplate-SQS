@@ -1,0 +1,35 @@
+# --- Python General ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual Environments (uv standard) ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Tools Cache (Critical for Strict Guidelines) ---
+# Ruff (Linting cache)
+.ruff_cache/
+
+# Mypy (Type checking cache)
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pytest (Testing cache)
+.pytest_cache/
+
+# --- Distribution / Builds ---
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Environment Variables (Security) ---
+# 秘密鍵などが含まれるため絶対にコミットしない
+.env
+.env.*
+!.env.example
+!.env.template

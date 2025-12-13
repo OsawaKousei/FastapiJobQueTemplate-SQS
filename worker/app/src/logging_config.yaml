@@ -1,0 +1,39 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  json:
+    class: pythonjsonlogger.json.JsonFormatter
+    format: "%(asctime)s %(levelname)s %(name)s %(message)s %(request_id)s"
+  simple:
+    format: "%(asctime)s - %(levelname)s - [%(request_id)s] - %(message)s"
+
+filters:
+  request_id:
+    (): src.shared.logging_utils.RequestIdFilter
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: json
+    filters: [request_id]
+    stream: ext://sys.stdout
+
+loggers:
+  app:
+    level: INFO
+    handlers: [console]
+    propagate: false
+  uvicorn:
+    level: INFO
+    handlers: [console]
+    propagate: false
+  uvicorn.access:
+    level: INFO
+    handlers: [console]
+    propagate: false
+
+root:
+  level: INFO
+  handlers: [console]

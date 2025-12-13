@@ -30,7 +30,7 @@ zip dummy.zip dummy.py
 awslocal lambda create-function \
     --function-name $FUNC_NAME \
     --runtime python3.12 \
-    --handler app.src.worker.handler \
+    --handler src.worker.handler \
     --role arn:aws:iam::000000000000:role/lambda-role \
     --zip-file fileb://dummy.zip \
     --region $REGION \
