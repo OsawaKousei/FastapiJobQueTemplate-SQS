@@ -1,14 +1,14 @@
 import logging
 import logging.config
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Awaitable, Callable
+from typing import Any, AsyncGenerator, Awaitable, Callable, Dict
 
 import yaml
 from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel, ConfigDict
 
-from src.domain.jobs.router import router as jobs_router
 from src.shared.logging_utils import generate_request_id, set_request_id
+from src.worker import handler as worker_handler
 
 # Load logging configuration
 try:
@@ -76,5 +76,12 @@ async def health_check() -> HealthResponse:
     )
 
 
-# 6. Router Registration
-app.include_router(jobs_router)
+@app.post("/")
+async def handle_sqs_event(event: Dict[str, Any]) -> Dict[str, Any]:
+    logger.info("Received SQS event")
+    # Invoke the worker handler synchronously as it is CPU bound or blocking I/O
+    # In a real async app, we might want to run this in a thread pool if it blocks
+    # But for this template, direct call is fine or we can use run_in_executor if needed.
+    # Since handler uses synchronous boto3, it will block the event loop.
+    # For low throughput local testing, it's acceptable.
+    return worker_handler(event, None)

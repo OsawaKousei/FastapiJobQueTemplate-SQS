@@ -1,4 +1,3 @@
-import time
 import uuid
 from typing import Union
 
@@ -31,17 +30,3 @@ class JobService:
         if job:
             return Success(job)
         return Failure("Job not found")
-
-    def process_job(self, job_id: str) -> None:
-        print(f"[Logic] Start processing job: {job_id}")
-
-        # 1. Update status to PROCESSING
-        self.repository.update_status(job_id, JobStatus.PROCESSING)
-
-        # Heavy computation simulation
-        time.sleep(3)
-        result_data = "Success via LocalStack"
-
-        # 2. Update status to COMPLETED
-        self.repository.update_status(job_id, JobStatus.COMPLETED, result_data)
-        print(f"[Logic] Job {job_id} completed.")

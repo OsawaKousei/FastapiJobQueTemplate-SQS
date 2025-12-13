@@ -3,15 +3,11 @@ from typing import Any, Dict
 from src.config import Settings
 from src.domain.jobs.services import JobService
 from src.infrastructure.aws.dynamodb import DynamoDBJobRepository
-from src.infrastructure.aws.sqs import SQSJobQueue
 
 # Initialize dependencies globally for Lambda container reuse
 settings = Settings()
 repository = DynamoDBJobRepository(settings)
-queue = SQSJobQueue(
-    settings
-)  # Not strictly needed for worker unless it sends messages, but good for completeness
-service = JobService(repository, queue)
+service = JobService(repository)
 
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
