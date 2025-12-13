@@ -1,17 +1,19 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException
-from src.domain.jobs.schemas import JobRequest, JobResponse, Job
-from src.domain.jobs.services import JobService
+
 from src.dependencies import get_job_service
-from src.shared.result import Success, Failure
+from src.domain.jobs.schemas import JobRequest, JobResponse
+from src.domain.jobs.services import JobService
+from src.shared.result import Failure, Success
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
+
 @router.post("", response_model=JobResponse)
 def create_job(
-    request: JobRequest,
-    service: Annotated[JobService, Depends(get_job_service)]
-):
+    request: JobRequest, service: Annotated[JobService, Depends(get_job_service)]
+) -> JobResponse:
     result = service.create_job(request)
     match result:
         case Success(value=job):
@@ -21,11 +23,11 @@ def create_job(
         case _:
             raise HTTPException(status_code=500, detail="Internal Server Error")
 
+
 @router.get("/{job_id}", response_model=JobResponse)
 def get_job(
-    job_id: str,
-    service: Annotated[JobService, Depends(get_job_service)]
-):
+    job_id: str, service: Annotated[JobService, Depends(get_job_service)]
+) -> JobResponse:
     result = service.get_job(job_id)
     match result:
         case Success(value=job):
