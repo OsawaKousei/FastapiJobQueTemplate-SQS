@@ -1,22 +1,22 @@
 volumes:
-  app-dynamodb-data:
-  app-postgres-data:
-  app-python-packages:
+  fastapijobquetemplate-sqs-dynamodb-data:
+  fastapijobquetemplate-sqs-postgres-data:
+  fastapijobquetemplate-sqs-python-packages:
 
 services:
-  app:
+  fastapijobquetemplate-sqs:
     build:
       context: .
       dockerfile: Dockerfile.dev
     volumes:
       - ./app:/app
-      - app-python-packages:/app/.venv
+      - fastapijobquetemplate-sqs-python-packages:/app/.venv
     ports:
       - "8080:8080"
     networks:
       - app-network
 
-  dynamodb:
+  fastapijobquetemplate-sqs-dynamodb:
     image: amazon/dynamodb-local:latest
     user: root
     ports:
@@ -26,12 +26,12 @@ services:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data"
     volumes:
       # 2. 作成したボリュームをデータ保存先にマウント
-      - app-dynamodb-data:/home/dynamodblocal/data
+      - fastapijobquetemplate-sqs-dynamodb-data:/home/dynamodblocal/data
     working_dir: /home/dynamodblocal
     networks:
       - app-network
 
-  postgres:
+  fastapijobquetemplate-sqs-postgres:
     image: postgres:18
     restart: always
     environment:
@@ -41,7 +41,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - app-postgres-data:/var/lib/postgresql
+      - fastapijobquetemplate-sqs-postgres-data:/var/lib/postgresql
     networks:
       - app-network
 
