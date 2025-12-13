@@ -1,6 +1,4 @@
 volumes:
-  fastapijobquetemplate-sqs-dynamodb-data:
-  fastapijobquetemplate-sqs-postgres-data:
   fastapijobquetemplate-sqs-python-packages:
 
 services:
@@ -13,35 +11,33 @@ services:
       - fastapijobquetemplate-sqs-python-packages:/app/.venv
     ports:
       - "8080:8080"
-    networks:
-      - app-network
-
-  fastapijobquetemplate-sqs-dynamodb:
-    image: amazon/dynamodb-local:latest
-    user: root
-    ports:
-      - "8000:8000"
-    # -sharedDb: 必須。これがないと接続ごとに別ファイル扱いになることがある
-    # -dbPath: データを /home/dynamodblocal/data に保存するよう指示
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data"
-    volumes:
-      # 2. 作成したボリュームをデータ保存先にマウント
-      - fastapijobquetemplate-sqs-dynamodb-data:/home/dynamodblocal/data
-    working_dir: /home/dynamodblocal
-    networks:
-      - app-network
-
-  fastapijobquetemplate-sqs-postgres:
-    image: postgres:18
-    restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - AWS_DEFAULT_REGION=ap-northeast-1
+      - TABLE_NAME=Jobs
+      - QUEUE_NAME=job-queue
+    depends_on:
+      - localstack
+    networks:
+      - app-network
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack_main
     ports:
-      - "5433:5432"
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs,dynamodb,lambda
+      - DEBUG=1
+      - AWS_DEFAULT_REGION=ap-northeast-1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      # Lambda起動時にホストの ./app を /var/task/app にマウントする
+      - LAMBDA_DOCKER_FLAGS=-v ${PWD}/app:/var/task/app
     volumes:
-      - fastapijobquetemplate-sqs-postgres-data:/var/lib/postgresql
+      # Docker in Docker (Lambdaコンテナ起動用)
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # 初期化スクリプト
+      - "./init_aws.sh:/etc/localstack/init/ready.d/init_aws.sh"
     networks:
       - app-network
 

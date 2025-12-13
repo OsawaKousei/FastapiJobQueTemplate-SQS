@@ -11,7 +11,9 @@ class Settings(BaseSettings):
 
     # DynamoDB
     # Lambda環境ではNone（AWS DynamoDBを使用）、ローカル開発では環境変数で指定
-    dynamodb_endpoint_url: str | None = None
+    aws_endpoint_url: str | None = None
+    table_name: str = "Jobs"
+    queue_name: str = "job-queue"
 
     # Database
     db_type: str = "dynamodb"  # "dynamodb" or "postgres"

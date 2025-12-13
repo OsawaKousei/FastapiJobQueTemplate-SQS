@@ -1,19 +1,14 @@
 import logging
 import logging.config
 from contextlib import asynccontextmanager
-from typing import Annotated, AsyncGenerator, Awaitable, Callable
+from typing import AsyncGenerator, Awaitable, Callable
 
 import yaml
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel, ConfigDict
 
-from src.dependencies import get_mock_sim_service
-from src.domain.mocks.exceptions import MockNotFoundError
-from src.domain.mocks.router import router as mocks_router
-from src.domain.mocks.services import MockSimulatorService
+from src.domain.jobs.router import router as jobs_router
 from src.shared.logging_utils import generate_request_id, set_request_id
-from src.shared.result import Failure, Success
 
 # Load logging configuration
 try:
@@ -48,8 +43,8 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
 
 # 3. App Definition
 app = FastAPI(
-    title="Serverless Mock API Generator",
-    description="A serverless API to manage and simulate mock endpoints.",
+    title="Serverless Job Queue API",
+    description="A serverless API to manage jobs using SQS and Lambda.",
     version="0.1.0",
     lifespan=lifespan,
     docs_url="/docs",
@@ -82,59 +77,4 @@ async def health_check() -> HealthResponse:
 
 
 # 6. Router Registration
-app.include_router(mocks_router)
-
-
-# 7. Simulation Catch-all Route
-async def _execute_simulation(
-    request: Request,
-    path: str,
-    service: MockSimulatorService,
-) -> Response:
-    # 1. Construct search key
-    # FastAPI strips the leading slash from path parameter
-    full_path = f"/{path}"
-    method = request.method
-
-    # 2. Execute simulation
-    result = await service.execute(method, full_path)
-
-    # 3. Build response
-    match result:
-        case Success(sim_result):
-            # If body is string, we might want to return Response directly
-            # to avoid extra quoting
-            if isinstance(sim_result.body, str):
-                return Response(
-                    content=sim_result.body,
-                    status_code=sim_result.status_code,
-                    headers=sim_result.headers,
-                )
-
-            return JSONResponse(
-                content=sim_result.body,
-                status_code=sim_result.status_code,
-                headers=sim_result.headers,
-            )
-        case Failure(MockNotFoundError()):
-            raise HTTPException(status_code=404, detail="Mock not found")
-        case Failure(e):
-            raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/{path:path}")
-async def simulate_get(
-    request: Request,
-    path: str,
-    service: Annotated[MockSimulatorService, Depends(get_mock_sim_service)],
-) -> Response:
-    return await _execute_simulation(request, path, service)
-
-
-@app.api_route("/{path:path}", methods=["POST", "PUT", "DELETE", "PATCH"])
-async def simulate_others(
-    request: Request,
-    path: str,
-    service: Annotated[MockSimulatorService, Depends(get_mock_sim_service)],
-) -> Response:
-    return await _execute_simulation(request, path, service)
+app.include_router(jobs_router)

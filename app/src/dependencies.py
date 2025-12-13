@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.config import get_settings
+from src.config import get_settings, Settings
 from src.domain.mocks.repository import MockRepository
 from src.domain.mocks.services import MockManagementService, MockSimulatorService
 from src.domain.mocks.template_engine import TemplateEngine
@@ -13,6 +13,16 @@ from src.infrastructure.persistence.postgres.database import get_db_session
 from src.infrastructure.persistence.postgres.repositories.mock_repository import (
     PostgresMockRepository,
 )
+from src.domain.jobs.services import JobService
+from src.infrastructure.aws.dynamodb import DynamoDBJobRepository
+from src.infrastructure.aws.sqs import SQSJobQueue
+
+def get_job_service() -> JobService:
+    settings = get_settings()
+    repository = DynamoDBJobRepository(settings)
+    queue = SQSJobQueue(settings)
+    return JobService(repository, queue)
+
 
 
 async def get_repository(
