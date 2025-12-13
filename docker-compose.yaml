@@ -42,7 +42,7 @@ services:
       - AWS_DEFAULT_REGION=ap-northeast-1
       - DOCKER_HOST=unix:///var/run/docker.sock
       # 【重要】LambdaコンテナをこのComposeのネットワークに参加させる
-      - LAMBDA_DOCKER_NETWORK=local-dev-network
+      - LAMBDA_DOCKER_NETWORK=app-network
     volumes:
       # Docker in Docker (Lambda起動用)
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -54,3 +54,4 @@ services:
 networks:
   app-network:
     driver: bridge
+    name: app-network
