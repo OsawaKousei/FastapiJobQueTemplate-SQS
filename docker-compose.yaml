@@ -9,6 +9,7 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./backend/app:/app
+      - ./common:/app/common
       - backend-python-packages:/app/.venv
     ports:
       - "8080:8080"
@@ -23,6 +24,7 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./worker/app:/app
+      - ./common:/app/common
       - worker-python-packages:/app/.venv
     ports:
       - "8081:8080"
