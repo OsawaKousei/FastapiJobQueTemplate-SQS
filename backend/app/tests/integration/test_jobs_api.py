@@ -1,39 +1,38 @@
-from unittest.mock import MagicMock
-
 import pytest
-from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 
 from common.config import get_settings
 from common.infrastructure.aws.dynamodb import DynamoDBJobRepository
-from common.infrastructure.aws.sqs import SQSJobQueue
+from common.jobs.schemas import Job, JobStatus
 from common.jobs.services import JobService
 from src.dependencies import get_job_service
 from src.main import app
-
-client = TestClient(app)
-
-# Mock SQS because we might not have a real SQS container
-# We only want to test the API -> Service -> Repository flow with real DB
-# But Service also calls Queue.
-# We can override the dependency to use a real Repository but a Mock Queue.
+from tests.fakes.fake_job_queue import FakeJobQueue
 
 
 @pytest.fixture
 def override_dependencies():
     settings = get_settings()
+    # Use real repository (connected to local DynamoDB via conftest setup)
     real_repo = DynamoDBJobRepository(settings)
-    mock_queue = MagicMock(spec=SQSJobQueue)
+    # Use Fake Queue instead of Mock
+    fake_queue = FakeJobQueue()
 
     def get_service_override():
-        return JobService(real_repo, mock_queue)
+        return JobService(real_repo, fake_queue)
 
     app.dependency_overrides[get_job_service] = get_service_override
     yield
     app.dependency_overrides = {}
 
 
-def test_create_job(override_dependencies):
-    response = client.post("/jobs", json={"payload": "api_payload"})
+@pytest.mark.asyncio
+async def test_create_job(override_dependencies):
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        response = await client.post("/jobs", json={"payload": "api_payload"})
+
     assert response.status_code == 200
     data = response.json()
     assert "job_id" in data
@@ -47,16 +46,20 @@ def test_create_job(override_dependencies):
     assert job.payload == "api_payload"
 
 
-def test_get_job(override_dependencies):
+@pytest.mark.asyncio
+async def test_get_job(override_dependencies):
     # First create a job directly in DB
     settings = get_settings()
     repo = DynamoDBJobRepository(settings)
-    from common.jobs.schemas import Job, JobStatus
 
     job = Job(job_id="api_job_1", status=JobStatus.COMPLETED, payload="p", result="r")
     repo.save(job)
 
-    response = client.get("/jobs/api_job_1")
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        response = await client.get("/jobs/api_job_1")
+
     assert response.status_code == 200
     data = response.json()
     assert data["job_id"] == "api_job_1"
@@ -64,6 +67,10 @@ def test_get_job(override_dependencies):
     assert data["result"] == "r"
 
 
-def test_get_job_not_found(override_dependencies):
-    response = client.get("/jobs/non_existent_api")
+@pytest.mark.asyncio
+async def test_get_job_not_found(override_dependencies):
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        response = await client.get("/jobs/non_existent_api")
     assert response.status_code == 404

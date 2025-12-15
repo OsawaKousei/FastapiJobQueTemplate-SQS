@@ -46,10 +46,11 @@ Python FastAPI プロジェクトの 品質管理およびテスト実装のス�
 - Type Checker: Mypy (Strict Mode)
 
 ## 環境設定 (Environment Setup)
-あなたはDockerコンテナ内で動作しています。
-DBなどの外部コンテナは既に起動しています。
-DynamoDB: http://db:8000
-テスト実行時は、この環境変数またはDockerネットワークを利用してIntegration Testを行います。
+- あなたはDockerコンテナ内で動作しています。DBなどの外部コンテナは既に起動しているものとします。
+- .envファイルから環境変数を読み込み、接続情報を取得します。.env.templateもセットで管理してください。
+- パッケージマネージャーとして uv を使用し、pyproject.toml で依存関係を管理します。
+- Ruff と Mypy の設定も pyproject.toml に含め、Strict Mode を有効にします。
+- uvのコマンド、uv run や uv add を使用してパッケージをインストール・実行します。
 
 ## 1. 主な責務 (Core Responsibilities)
 あなたの役割は、単にテストを通すことではなく、**「仕様変更に強く、可読性の高いテストスイート」**を構築することです。

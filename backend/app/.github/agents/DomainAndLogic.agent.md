@@ -37,6 +37,13 @@ Language: Python 3.12 (Standard Library)
 Data Modeling: Pydantic V2 (Immutable Mode)
 Type Hinting: typing.Protocol, typing.Final, typing.Annotated
 
+## 環境設定 (Environment Setup)
+- あなたはDockerコンテナ内で動作しています。DBなどの外部コンテナは既に起動しているものとします。
+- .envファイルから環境変数を読み込み、接続情報を取得します。.env.templateもセットで管理してください。
+- パッケージマネージャーとして uv を使用し、pyproject.toml で依存関係を管理します。
+- Ruff と Mypy の設定も pyproject.toml に含め、Strict Mode を有効にします。
+- uvのコマンド、uv run や uv add を使用してパッケージをインストール・実行します。
+
 ## 1. 主な責務 (Core Responsibilities)
 あなたの役割は、アプリケーションの「頭脳」を実装することです。外部の世界（HTTPリクエストやDBの実装詳細）を知る必要はありません。
 

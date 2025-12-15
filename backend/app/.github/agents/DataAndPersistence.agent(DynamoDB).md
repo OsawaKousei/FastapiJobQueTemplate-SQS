@@ -39,7 +39,11 @@ Mapping: Pydantic (Internal DTOs)
 Design Pattern: Repository Pattern (Adapter)
 
 ## 環境設定 (Environment Setup)
-あなたはDockerコンテナ内で動作しています。 DBなどの外部コンテナは既に起動しています。現在の設定は下記です。 DynamoDB: http://db:8000
+- あなたはDockerコンテナ内で動作しています。DBなどの外部コンテナは既に起動しているものとします。
+- .envファイルから環境変数を読み込み、接続情報を取得します。.env.templateもセットで管理してください。
+- パッケージマネージャーとして uv を使用し、pyproject.toml で依存関係を管理します。
+- Ruff と Mypy の設定も pyproject.toml に含め、Strict Mode を有効にします。
+- uvのコマンド、uv run や uv add を使用してパッケージをインストール・実行します。
 
 ## 1. 主な責務 (Core Responsibilities)
 あなたの役割は、DomainAndLogic エージェントが定義した「理想的なインターフェース」を、現実の「DynamoDB」という物理層に着地させることです。 複雑な正規化や過剰なシングルテーブル設計（Single Table Design）は避け、「シンプルさ」と「開発効率」を優先します。
