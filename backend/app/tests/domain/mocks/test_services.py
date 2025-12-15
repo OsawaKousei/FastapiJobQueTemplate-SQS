@@ -1,5 +1,4 @@
 import pytest
-
 from src.domain.mocks.exceptions import MockAlreadyExistsError, MockNotFoundError
 from src.domain.mocks.schemas import (
     HttpMethod,
@@ -8,7 +7,8 @@ from src.domain.mocks.schemas import (
 )
 from src.domain.mocks.services import MockManagementService, MockSimulatorService
 from src.domain.mocks.template_engine import TemplateEngine
-from src.shared.result import Failure, Success
+
+from common.shared.result import Failure, Success
 
 
 class InMemoryMockRepository:

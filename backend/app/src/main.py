@@ -7,8 +7,8 @@ import yaml
 from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel, ConfigDict
 
+from common.shared.logging_utils import generate_request_id, set_request_id
 from src.domain.jobs.router import router as jobs_router
-from src.shared.logging_utils import generate_request_id, set_request_id
 
 # Load logging configuration
 try:

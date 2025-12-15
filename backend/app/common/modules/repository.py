@@ -1,6 +1,6 @@
 from typing import Optional, Protocol
 
-from src.domain.jobs.schemas import Job
+from common.modules.schemas import Job
 
 
 class JobRepository(Protocol):

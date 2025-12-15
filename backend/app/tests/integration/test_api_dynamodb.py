@@ -2,7 +2,7 @@ import boto3
 import pytest
 from fastapi.testclient import TestClient
 
-from src.config import get_settings
+from common.config import get_settings
 from src.main import app
 
 

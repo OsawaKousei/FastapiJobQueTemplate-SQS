@@ -2,9 +2,9 @@ from typing import Optional
 
 import boto3
 
-from src.config import Settings
-from src.domain.jobs.repository import JobRepository
-from src.domain.jobs.schemas import Job
+from common.config import Settings
+from common.modules.repository import JobRepository
+from common.modules.schemas import Job
 
 
 class DynamoDBJobRepository(JobRepository):

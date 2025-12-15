@@ -2,10 +2,10 @@ import uuid
 
 import boto3
 import pytest
-
-from src.config import get_settings
 from src.domain.mocks.schemas import HttpMethod, MockEndpoint
 from src.infrastructure.dynamodb.mock_repository import DynamoMockRepository
+
+from common.config import get_settings
 
 
 @pytest.fixture(scope="module")

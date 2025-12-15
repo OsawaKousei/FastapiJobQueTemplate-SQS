@@ -1,7 +1,7 @@
 import boto3
 
-from src.config import Settings
-from src.domain.jobs.queue import JobQueue
+from common.config import Settings
+from common.modules.queue import JobQueue, QueueMessage
 
 
 class SQSJobQueue(JobQueue):
@@ -29,3 +29,26 @@ class SQSJobQueue(JobQueue):
 
     def send_message(self, message_body: str) -> None:
         self.sqs.send_message(QueueUrl=self.queue_url, MessageBody=message_body)
+
+    def receive_messages(
+        self, max_messages: int = 1, wait_time_seconds: int = 20
+    ) -> list[QueueMessage]:
+        response = self.sqs.receive_message(
+            QueueUrl=self.queue_url,
+            MaxNumberOfMessages=max_messages,
+            WaitTimeSeconds=wait_time_seconds,
+        )
+        messages = []
+        if "Messages" in response:
+            for msg in response["Messages"]:
+                messages.append(
+                    QueueMessage(
+                        message_id=msg["MessageId"],
+                        body=msg["Body"],
+                        receipt_handle=msg["ReceiptHandle"],
+                    )
+                )
+        return messages
+
+    def delete_message(self, receipt_handle: str) -> None:
+        self.sqs.delete_message(QueueUrl=self.queue_url, ReceiptHandle=receipt_handle)

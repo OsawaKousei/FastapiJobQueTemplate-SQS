@@ -1,7 +1,7 @@
-from src.config import get_settings
-from src.domain.jobs.services import JobService
-from src.infrastructure.aws.dynamodb import DynamoDBJobRepository
-from src.infrastructure.aws.sqs import SQSJobQueue
+from common.config import get_settings
+from common.infrastructure.aws.dynamodb import DynamoDBJobRepository
+from common.infrastructure.aws.sqs import SQSJobQueue
+from common.modules.services import JobService
 
 
 def get_job_service() -> JobService:
