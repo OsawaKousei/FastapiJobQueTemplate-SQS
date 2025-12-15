@@ -45,7 +45,8 @@ class JobProcessor:
             job = self.repository.get(job_id)
             if not job:
                 logger.error(f"Job {job_id} not found in repository")
-                # If job is not found, we can't process it. Delete message to avoid loop.
+                # If job is not found, we can't process it.
+                # Delete message to avoid loop.
                 self.queue.delete_message(message.receipt_handle)
                 return True
 
