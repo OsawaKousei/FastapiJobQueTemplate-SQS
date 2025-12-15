@@ -7,7 +7,7 @@ import yaml
 from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel, ConfigDict
 
-from src.shared.logging_utils import generate_request_id, set_request_id
+from common.shared.logging_utils import generate_request_id, set_request_id
 from src.worker import handler as worker_handler
 
 # Load logging configuration
@@ -22,7 +22,7 @@ except FileNotFoundError:
 logger = logging.getLogger("app")
 
 
-# 1. Schema Definition (Minimal Strict Guideline Compliance)
+# 1. Schema Definition
 class HealthResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
     status: str
@@ -43,8 +43,8 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
 
 # 3. App Definition
 app = FastAPI(
-    title="Serverless Job Queue API",
-    description="A serverless API to manage jobs using SQS and Lambda.",
+    title="Worker Container",
+    description="A worker container acting as a FastAPI app (Lambda Adapter).",
     version="0.1.0",
     lifespan=lifespan,
     docs_url="/docs",
@@ -72,16 +72,13 @@ async def health_check() -> HealthResponse:
     logger.info("Health check endpoint called.")
     return HealthResponse(
         status="ok",
-        message="Server is running.",
+        message="Worker is running.",
     )
 
 
 @app.post("/")
 async def handle_sqs_event(event: Dict[str, Any]) -> Dict[str, Any]:
     logger.info("Received SQS event")
-    # Invoke the worker handler synchronously as it is CPU bound or blocking I/O
+    # Invoke the worker handler synchronously
     # In a real async app, we might want to run this in a thread pool if it blocks
-    # But for this template, direct call is fine or we can use run_in_executor if needed.
-    # Since handler uses synchronous boto3, it will block the event loop.
-    # For low throughput local testing, it's acceptable.
     return worker_handler(event, None)

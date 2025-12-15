@@ -10,7 +10,7 @@ formatters:
 
 filters:
   request_id:
-    (): src.shared.logging_utils.RequestIdFilter
+    (): common.shared.logging_utils.RequestIdFilter
 
 handlers:
   console:
