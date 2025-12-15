@@ -1,9 +1,9 @@
 import logging
 from typing import Protocol
 
-from common.modules.queue import JobQueue
-from common.modules.repository import JobRepository
-from common.modules.schemas import JobStatus
+from common.jobs.queue import JobQueue
+from common.jobs.repository import JobRepository
+from common.jobs.schemas import JobStatus
 
 logger = logging.getLogger(__name__)
 

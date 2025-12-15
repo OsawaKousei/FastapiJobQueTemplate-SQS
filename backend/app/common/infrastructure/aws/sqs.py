@@ -1,7 +1,7 @@
 import boto3
 
 from common.config import Settings
-from common.modules.queue import JobQueue, QueueMessage
+from common.jobs.queue import JobQueue, QueueMessage
 
 
 class SQSJobQueue(JobQueue):

@@ -3,8 +3,8 @@ from typing import Optional
 import boto3
 
 from common.config import Settings
-from common.modules.repository import JobRepository
-from common.modules.schemas import Job
+from common.jobs.repository import JobRepository
+from common.jobs.schemas import Job
 
 
 class DynamoDBJobRepository(JobRepository):

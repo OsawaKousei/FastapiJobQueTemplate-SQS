@@ -1,9 +1,9 @@
 import uuid
 from typing import Union
 
-from common.modules.queue import JobQueue
-from common.modules.repository import JobRepository
-from common.modules.schemas import Job, JobRequest, JobStatus
+from common.jobs.queue import JobQueue
+from common.jobs.repository import JobRepository
+from common.jobs.schemas import Job, JobRequest, JobStatus
 from common.shared.result import Failure, Success
 
 Result = Union[Success[Job], Failure[Exception]]

@@ -2,8 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from common.modules.schemas import JobRequest, JobResponse
-from common.modules.services import JobService
+from common.jobs.schemas import JobRequest, JobResponse
+from common.jobs.services import JobService
 from common.shared.result import Failure, Success
 from src.dependencies import get_job_service
 
