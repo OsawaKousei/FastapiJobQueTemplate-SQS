@@ -1,14 +1,14 @@
 import logging
 import logging.config
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator, Awaitable, Callable, Dict
+from typing import AsyncGenerator, Awaitable, Callable
 
 import yaml
 from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel, ConfigDict
 
 from common.shared.logging_utils import generate_request_id, set_request_id
-from src.worker import handler as worker_handler
+from src.router import router as worker_router
 
 # Load logging configuration
 try:
@@ -22,37 +22,27 @@ except FileNotFoundError:
 logger = logging.getLogger("app")
 
 
-# 1. Schema Definition
 class HealthResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
     status: str
     message: str
 
 
-# 2. Lifespan Management
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
-    # Startup logic
-    logger.info("Application startup sequence initiated.")
-
+    logger.info("Worker application startup.")
     yield
-
-    # Shutdown logic
-    logger.info("Application shutdown sequence initiated.")
+    logger.info("Worker application shutdown.")
 
 
-# 3. App Definition
 app = FastAPI(
-    title="Worker Container",
-    description="A worker container acting as a FastAPI app (Lambda Adapter).",
+    title="Worker Service",
+    description="Worker service for processing jobs.",
     version="0.1.0",
     lifespan=lifespan,
-    docs_url="/docs",
-    redoc_url="/redoc",
 )
 
 
-# 4. Middleware
 @app.middleware("http")
 async def request_id_middleware(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
@@ -66,19 +56,9 @@ async def request_id_middleware(
     return response
 
 
-# 5. Root Endpoint (Health Check)
-@app.get("/", response_model=HealthResponse)
+@app.get("/health", response_model=HealthResponse)
 async def health_check() -> HealthResponse:
-    logger.info("Health check endpoint called.")
-    return HealthResponse(
-        status="ok",
-        message="Worker is running.",
-    )
+    return HealthResponse(status="ok", message="Worker is running.")
 
 
-@app.post("/")
-async def handle_sqs_event(event: Dict[str, Any]) -> Dict[str, Any]:
-    logger.info("Received SQS event")
-    # Invoke the worker handler synchronously
-    # In a real async app, we might want to run this in a thread pool if it blocks
-    return worker_handler(event, None)
+app.include_router(worker_router)

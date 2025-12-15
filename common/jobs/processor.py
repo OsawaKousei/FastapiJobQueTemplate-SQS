@@ -35,6 +35,19 @@ class JobProcessor:
         message = messages[0]
         job_id = message.body  # Assuming message body is job_id
 
+        try:
+            self.process_job(job_id)
+        except Exception as e:
+            logger.error(f"Error processing job {job_id}: {e}")
+
+        # Delete message from queue after processing attempt
+        self.queue.delete_message(message.receipt_handle)
+        return True
+
+    def process_job(self, job_id: str) -> None:
+        """
+        Process a single job by ID.
+        """
         logger.info(f"Processing job: {job_id}")
 
         # Update status to PROCESSING
@@ -45,25 +58,16 @@ class JobProcessor:
             job = self.repository.get(job_id)
             if not job:
                 logger.error(f"Job {job_id} not found in repository")
-                # If job is not found, we can't process it.
-                # Delete message to avoid loop.
-                self.queue.delete_message(message.receipt_handle)
-                return True
+                return
 
-            # Execute handler
+            # Run handler
             result = self.handler(job.payload)
 
             # Update status to COMPLETED
-            self.repository.update_status(job_id, JobStatus.COMPLETED, result=result)
+            self.repository.update_status(job_id, JobStatus.COMPLETED, result)
             logger.info(f"Job {job_id} completed successfully")
 
         except Exception as e:
             logger.error(f"Job {job_id} failed: {e}")
-            self.repository.update_status(job_id, JobStatus.FAILED, result=str(e))
-            # Depending on policy, we might not delete the message to retry,
-            # or delete it to avoid infinite loop if it's a logic error.
-            # For now, let's assume we delete it and handle retry elsewhere or use DLQ.
-
-        # Delete message from queue
-        self.queue.delete_message(message.receipt_handle)
-        return True
+            self.repository.update_status(job_id, JobStatus.FAILED, str(e))
+            raise e
