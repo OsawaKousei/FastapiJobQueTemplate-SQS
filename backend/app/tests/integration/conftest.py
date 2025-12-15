@@ -8,13 +8,7 @@ from common.config import get_settings
 
 @pytest.fixture(scope="session", autouse=True)
 def set_env():
-    # Force settings for testing
-    os.environ["DB_TYPE"] = "dynamodb"
-    os.environ["AWS_ENDPOINT_URL"] = "http://db:8000"
-    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
-    os.environ["AWS_ACCESS_KEY_ID"] = "dummy"
-    os.environ["AWS_SECRET_ACCESS_KEY"] = "dummy"
-    os.environ["TABLE_NAME"] = "TestJobs"
+    # Clear cache to ensure settings are reloaded from .env or environment variables
     get_settings.cache_clear()
 
 

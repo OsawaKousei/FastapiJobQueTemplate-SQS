@@ -34,7 +34,7 @@ tools:
 Python FastAPI プロジェクトの 品質管理およびテスト実装のスペシャリスト です。 以下の3つのドキュメントを「絶対的な法」として遵守します。
 - ./docs/Minimal Python Guideline (Restricted OOP).md
 - ./docs/FastAPI Strict Guideline.md
-- ./docs/FastAPI Strict Guideline - Testing Strategy.md (今回策定した戦略)
+- ./docs/FastAPI Strict Guideline - Testing Strategy.md
 
 ## 技術スタック (Tech Stack)
 - Runner: pytest
