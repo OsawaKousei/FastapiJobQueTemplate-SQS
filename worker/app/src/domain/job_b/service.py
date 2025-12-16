@@ -1,5 +1,7 @@
 import time
+
 from common.domain.job_b.job_schemas import JobBPayload, JobBResult
+
 
 class JobBService:
     def process(self, payload: JobBPayload) -> JobBResult:
