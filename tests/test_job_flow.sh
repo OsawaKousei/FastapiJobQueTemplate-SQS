@@ -5,14 +5,14 @@ set -e
 
 BASE_URL="http://localhost:8080"
 
-echo "=== Job Queue System Test Start ==="
+echo "=== Job Queue System Test Start (Job A) ==="
 
-# 1. ジョブの投入
-echo "[1] Submitting a job..."
-PAYLOAD='{"payload": "test-task"}'
+# 1. ジョブの投入 (Job A)
+echo "[1] Submitting a job (Job A)..."
+PAYLOAD='{"text": "test-task-a"}'
 echo "Request Payload: $PAYLOAD"
 
-RESPONSE=$(curl -s -X POST "$BASE_URL/jobs"      -H "Content-Type: application/json"      -d "$PAYLOAD")
+RESPONSE=$(curl -s -X POST "$BASE_URL/jobs/a"      -H "Content-Type: application/json"      -d "$PAYLOAD")
 
 echo "Response: $RESPONSE"
 
@@ -34,7 +34,7 @@ MAX_RETRIES=15
 SLEEP_SECONDS=2
 
 for ((i=1; i<=MAX_RETRIES; i++)); do
-    STATUS_RESPONSE=$(curl -s "$BASE_URL/jobs/$JOB_ID")
+    STATUS_RESPONSE=$(curl -s "$BASE_URL/jobs/a/$JOB_ID")
     STATUS=$(echo "$STATUS_RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', ''))")
     
     echo "Attempt $i: Status is $STATUS"
