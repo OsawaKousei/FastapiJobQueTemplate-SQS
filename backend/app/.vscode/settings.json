@@ -22,12 +22,12 @@
   },
   // ワークスペース全体をチェック対象にする（follow-imports=skipの逆）
   "mypy-type-checker.reportingScope": "workspace",
-  "remote.extensionKind": {
-    "GitHub.copilot": [
-      "ui"
-    ],
-    "GitHub.copilot-chat": [
-      "ui"
-    ]
-  }
+  // "remote.extensionKind": {
+  //   "GitHub.copilot": [
+  //     "ui"
+  //   ],
+  //   "GitHub.copilot-chat": [
+  //     "ui"
+  //   ]
+  // }
 }

@@ -1,7 +1,7 @@
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 
-from common.jobs.schemas import Job, JobRequest, JobStatus
+from common.jobs.schemas import Job, JobRequest, JobStatus, JobType
 from common.jobs.services import JobService
 from common.shared.result import Failure, Success
 from tests.fakes.fake_job_queue import FakeJobQueue
@@ -35,7 +35,8 @@ def test_create_job_success(
     service: JobService, fake_repo: FakeJobRepository, fake_queue: FakeJobQueue
 ) -> None:
     # Arrange
-    request = JobRequestFactory.build(payload="test_payload")
+    payload = {"message": "test_payload"}
+    request = JobRequestFactory.build(payload=payload, job_type=JobType.JOB_A)
 
     # Act
     result = service.create_job(request)
@@ -43,7 +44,8 @@ def test_create_job_success(
     # Assert
     assert isinstance(result, Success)
     job = result.value
-    assert job.payload == "test_payload"
+    assert job.payload == payload
+    assert job.job_type == JobType.JOB_A
     assert job.status == JobStatus.QUEUED
     assert job.job_id is not None
 
@@ -65,7 +67,7 @@ def test_create_job_failure_repo(
 
     broken_repo = BrokenFakeRepo()
     service = JobService(repository=broken_repo, queue=fake_queue)
-    request = JobRequestFactory.build()
+    request = JobRequestFactory.build(payload={"data": "test"})
 
     # Act
     result = service.create_job(request)

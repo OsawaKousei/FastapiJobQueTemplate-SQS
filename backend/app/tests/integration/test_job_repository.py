@@ -1,13 +1,18 @@
 from common.config import get_settings
 from common.infrastructure.aws.dynamodb import DynamoDBJobRepository
-from common.jobs.schemas import Job, JobStatus
+from common.jobs.schemas import Job, JobStatus, JobType
 
 
 def test_save_and_get_job():
     settings = get_settings()
     repo = DynamoDBJobRepository(settings)
 
-    job = Job(job_id="job_1", status=JobStatus.QUEUED, payload="payload_1")
+    job = Job(
+        job_id="job_1",
+        job_type=JobType.JOB_A,
+        status=JobStatus.QUEUED,
+        payload={"data": "payload_1"},
+    )
 
     # Save
     saved_job = repo.save(job)
@@ -17,7 +22,7 @@ def test_save_and_get_job():
     fetched_job = repo.get("job_1")
     assert fetched_job is not None
     assert fetched_job.job_id == "job_1"
-    assert fetched_job.payload == "payload_1"
+    assert fetched_job.payload == {"data": "payload_1"}
     assert fetched_job.status == JobStatus.QUEUED
 
 
@@ -33,7 +38,12 @@ def test_update_status():
     settings = get_settings()
     repo = DynamoDBJobRepository(settings)
 
-    job = Job(job_id="job_2", status=JobStatus.QUEUED, payload="payload_2")
+    job = Job(
+        job_id="job_2",
+        job_type=JobType.JOB_B,
+        status=JobStatus.QUEUED,
+        payload={"data": "payload_2"},
+    )
     repo.save(job)
 
     # Update status
@@ -43,8 +53,8 @@ def test_update_status():
     assert fetched_job.status == JobStatus.PROCESSING
 
     # Update status with result
-    repo.update_status("job_2", JobStatus.COMPLETED, result="result_2")
+    repo.update_status("job_2", JobStatus.COMPLETED, result={"output": "result_2"})
 
     fetched_job = repo.get("job_2")
     assert fetched_job.status == JobStatus.COMPLETED
-    assert fetched_job.result == "result_2"
+    assert fetched_job.result == {"output": "result_2"}

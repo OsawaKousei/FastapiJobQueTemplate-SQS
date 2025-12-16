@@ -16,7 +16,7 @@ class FakeJobRepository(JobRepository):
         return self._storage.get(job_id)
 
     def update_status(
-        self, job_id: str, status: str, result: Optional[str] = None
+        self, job_id: str, status: str, result: Optional[dict] = None
     ) -> None:
         if job_id in self._storage:
             job = self._storage[job_id]
