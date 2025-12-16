@@ -1,5 +1,6 @@
 {
   "recommendations": [
+    "GitHub.copilot-chat",
     "oderwat.indent-rainbow",
     "redhat.vscode-yaml",
     "ms-python.python",
