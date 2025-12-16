@@ -4,7 +4,7 @@ import boto3
 
 from common.config import Settings
 from common.jobs.repository import JobRepository
-from common.jobs.schemas import Job
+from common.jobs.schemas import Job, JobStatus
 
 
 class DynamoDBJobRepository(JobRepository):
@@ -35,11 +35,11 @@ class DynamoDBJobRepository(JobRepository):
         return Job(**item)
 
     def update_status(
-        self, job_id: str, status: str, result: Optional[dict] = None
+        self, job_id: str, status: JobStatus, result: Optional[dict] = None
     ) -> None:
         update_expression = "set #st = :s"
         expression_attribute_names = {"#st": "status"}
-        expression_attribute_values = {":s": status}
+        expression_attribute_values = {":s": status.value}
 
         if result:
             update_expression += ", #r = :r"
