@@ -1,4 +1,3 @@
-import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -6,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from common.domain.job_a.job_schemas import JobAPayload
 from common.jobs.schemas import JobRequest, JobType
 from common.jobs.services import JobService
+from common.shared.logging_utils import request_id_context
 from common.shared.result import Failure, Success
 from src.dependencies import get_job_service
 from src.domain.api_a.schemas import MessageRequest, MessageResponse
@@ -21,9 +21,7 @@ async def submit_message(
     payload = JobAPayload(message=request.text)
 
     # Create Job Request
-    job_request = JobRequest(
-        job_type=JobType.JOB_A, payload=payload.model_dump()
-    )
+    job_request = JobRequest(job_type=JobType.JOB_A, payload=payload.model_dump())
 
     # Submit Job
     result = service.create_job(job_request)
@@ -31,7 +29,7 @@ async def submit_message(
     match result:
         case Success(job):
             return MessageResponse(
-                request_id=str(uuid.uuid4()),
+                request_id=request_id_context.get(),
                 job_id=job.job_id,
                 status=job.status.value,
                 text=request.text,
@@ -58,7 +56,7 @@ async def get_message_status(
             original_text = job.payload.get("message", "")
 
             return MessageResponse(
-                request_id=str(uuid.uuid4()),  # New request ID for the query
+                request_id=request_id_context.get(),
                 job_id=job.job_id,
                 status=job.status.value,
                 text=original_text,

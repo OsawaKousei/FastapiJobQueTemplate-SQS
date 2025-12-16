@@ -82,4 +82,3 @@ async def health_check() -> HealthResponse:
 app.include_router(api_a_router, prefix="/jobs/a", tags=["job_a"])
 app.include_router(api_b_router, prefix="/jobs/b", tags=["job_b"])
 app.include_router(api_c_router, prefix="/jobs/c", tags=["job_c"])
-
