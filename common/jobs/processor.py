@@ -8,7 +8,7 @@ from common.jobs.schemas import JobStatus, Job
 logger = logging.getLogger(__name__)
 
 
-class JobHandler(Protocol):
+class JobDispatcher(Protocol):
     def __call__(self, job: Job) -> Dict[str, Any]: ...
 
 
@@ -17,11 +17,11 @@ class JobProcessor:
         self,
         repository: JobRepository,
         queue: JobQueue,
-        handler: JobHandler,
+        dispatcher: JobDispatcher,
     ) -> None:
         self.repository = repository
         self.queue = queue
-        self.handler = handler
+        self.dispatcher = dispatcher
 
     def process_next(self) -> bool:
         """
@@ -60,8 +60,8 @@ class JobProcessor:
                 logger.error(f"Job {job_id} not found in repository")
                 return
 
-            # Run handler
-            result = self.handler(job)
+            # Run dispatcher
+            result = self.dispatcher(job)
 
             # Update status to COMPLETED
             self.repository.update_status(job_id, JobStatus.COMPLETED, result)
