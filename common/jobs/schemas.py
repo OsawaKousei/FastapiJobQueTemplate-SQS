@@ -11,15 +11,23 @@ class JobStatus(str, Enum):
     FAILED = "FAILED"
 
 
+class JobType(str, Enum):
+    JOB_A = "job_a"
+    JOB_B = "job_b"
+    JOB_C = "job_c"
+
+
 class JobRequest(BaseModel):
-    payload: str = Field(..., description="Payload for the job")
+    job_type: JobType
+    payload: dict = Field(..., description="Payload for the job")
 
 
 class Job(BaseModel):
     job_id: str
+    job_type: JobType
     status: JobStatus
-    payload: str
-    result: Optional[str] = None
+    payload: dict
+    result: Optional[dict] = None
 
     model_config = ConfigDict(from_attributes=True)
 

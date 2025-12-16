@@ -1,15 +1,15 @@
 import logging
-from typing import Protocol
+from typing import Protocol, Any, Dict
 
 from common.jobs.queue import JobQueue
 from common.jobs.repository import JobRepository
-from common.jobs.schemas import JobStatus
+from common.jobs.schemas import JobStatus, Job
 
 logger = logging.getLogger(__name__)
 
 
 class JobHandler(Protocol):
-    def __call__(self, payload: str) -> str: ...
+    def __call__(self, job: Job) -> Dict[str, Any]: ...
 
 
 class JobProcessor:
@@ -61,7 +61,7 @@ class JobProcessor:
                 return
 
             # Run handler
-            result = self.handler(job.payload)
+            result = self.handler(job)
 
             # Update status to COMPLETED
             self.repository.update_status(job_id, JobStatus.COMPLETED, result)

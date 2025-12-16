@@ -7,7 +7,7 @@ from common.config import Settings, get_settings
 from common.infrastructure.aws.dynamodb import DynamoDBJobRepository
 from common.infrastructure.aws.sqs import SQSJobQueue
 from common.jobs.processor import JobProcessor
-from src.handler import job_handler
+from src.dispatcher import JobDispatcher
 
 
 @lru_cache
@@ -31,4 +31,5 @@ def get_job_processor(
     repository: Annotated[DynamoDBJobRepository, Depends(get_job_repository)],
     queue: Annotated[SQSJobQueue, Depends(get_job_queue)],
 ) -> JobProcessor:
-    return JobProcessor(repository, queue, job_handler)
+    dispatcher = JobDispatcher()
+    return JobProcessor(repository, queue, dispatcher)

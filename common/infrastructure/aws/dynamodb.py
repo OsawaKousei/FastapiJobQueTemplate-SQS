@@ -34,7 +34,7 @@ class DynamoDBJobRepository(JobRepository):
         return Job(**item)
 
     def update_status(
-        self, job_id: str, status: str, result: Optional[str] = None
+        self, job_id: str, status: str, result: Optional[dict] = None
     ) -> None:
         update_expression = "set #st = :s"
         expression_attribute_names = {"#st": "status"}

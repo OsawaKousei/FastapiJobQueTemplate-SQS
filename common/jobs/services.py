@@ -16,7 +16,12 @@ class JobService:
 
     def create_job(self, request: JobRequest) -> Result:
         job_id = str(uuid.uuid4())
-        job = Job(job_id=job_id, status=JobStatus.QUEUED, payload=request.payload)
+        job = Job(
+            job_id=job_id,
+            job_type=request.job_type,
+            status=JobStatus.QUEUED,
+            payload=request.payload,
+        )
 
         try:
             self.repository.save(job)
