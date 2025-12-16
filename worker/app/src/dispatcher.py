@@ -10,10 +10,15 @@ from src.domain.job_c.service import JobCService
 
 
 class JobDispatcher:
-    def __init__(self) -> None:
-        self.service_a = JobAService()
-        self.service_b = JobBService()
-        self.service_c = JobCService()
+    def __init__(
+        self,
+        service_a: JobAService,
+        service_b: JobBService,
+        service_c: JobCService,
+    ) -> None:
+        self.service_a = service_a
+        self.service_b = service_b
+        self.service_c = service_c
 
     def __call__(self, job: Job) -> Dict[str, Any]:
         match job.job_type:
