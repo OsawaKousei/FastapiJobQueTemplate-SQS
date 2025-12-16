@@ -1,9 +1,9 @@
 import logging
-from typing import Protocol, Any, Dict
+from typing import Any, Dict, Protocol
 
 from common.jobs.queue import JobQueue
 from common.jobs.repository import JobRepository
-from common.jobs.schemas import JobStatus, Job
+from common.jobs.schemas import Job, JobStatus
 
 logger = logging.getLogger(__name__)
 
@@ -69,5 +69,5 @@ class JobProcessor:
 
         except Exception as e:
             logger.error(f"Job {job_id} failed: {e}")
-            self.repository.update_status(job_id, JobStatus.FAILED, str(e))
+            self.repository.update_status(job_id, JobStatus.FAILED, {"error": str(e)})
             raise e
