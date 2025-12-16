@@ -8,7 +8,6 @@ from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel, ConfigDict
 
 from common.shared.logging_utils import generate_request_id, set_request_id
-from src.domain.jobs.router import router as jobs_router
 from src.domain.api_a.router import router as api_a_router
 from src.domain.api_b.router import router as api_b_router
 from src.domain.api_c.router import router as api_c_router
@@ -81,7 +80,6 @@ async def health_check() -> HealthResponse:
 
 # 6. Router Registration
 app.include_router(jobs_router)
-app.include_router(api_a_router, prefix="/jobs/a", tags=["job_a"])
 app.include_router(api_b_router, prefix="/jobs/b", tags=["job_b"])
 app.include_router(api_c_router, prefix="/jobs/c", tags=["job_c"])
 

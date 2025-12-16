@@ -1,8 +1,7 @@
 import time
-from typing import Any, Dict
-from common.domain.job_c.job_schemas import JobCPayload
+from common.domain.job_c.job_schemas import JobCPayload, JobCResult
 
 class JobCService:
-    def process(self, payload: JobCPayload) -> Dict[str, Any]:
+    def process(self, payload: JobCPayload) -> JobCResult:
         time.sleep(3)
-        return {"tag_count": len(payload.tags), "tags": payload.tags, "status": "success"}
+        return JobCResult(tag_count=len(payload.tags), tags=payload.tags, status="success")

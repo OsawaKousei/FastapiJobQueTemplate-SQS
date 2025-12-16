@@ -23,6 +23,7 @@ class DynamoDBJobRepository(JobRepository):
         item = job.model_dump()
         # Enum to string
         item["status"] = item["status"].value
+        item["job_type"] = item["job_type"].value
         self.table.put_item(Item=item)
         return job
 

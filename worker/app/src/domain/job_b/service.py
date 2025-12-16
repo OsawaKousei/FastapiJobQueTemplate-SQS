@@ -1,8 +1,7 @@
 import time
-from typing import Any, Dict
-from common.domain.job_b.job_schemas import JobBPayload
+from common.domain.job_b.job_schemas import JobBPayload, JobBResult
 
 class JobBService:
-    def process(self, payload: JobBPayload) -> Dict[str, Any]:
+    def process(self, payload: JobBPayload) -> JobBResult:
         time.sleep(2)
-        return {"count_squared": payload.count * payload.count, "status": "success"}
+        return JobBResult(count_squared=payload.count * payload.count, status="success")
