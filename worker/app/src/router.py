@@ -3,6 +3,7 @@ from typing import Annotated, Any, Dict
 
 from fastapi import APIRouter, Depends
 
+from common.infrastructure.aws.schemas import SQSEvent
 from common.jobs.processor import JobProcessor
 from src.dependencies import get_job_processor
 
@@ -13,7 +14,7 @@ router = APIRouter()
 
 @router.post("/")
 async def handle_sqs_event(
-    event: Dict[str, Any],
+    event: SQSEvent,
     processor: Annotated[JobProcessor, Depends(get_job_processor)],
 ) -> Dict[str, Any]:
     """
@@ -22,18 +23,17 @@ async def handle_sqs_event(
     logger.info(f"Received event: {event}")
 
     # Check if it's an SQS event
-    records = event.get("Records", [])
-    if not records:
+    if not event.Records:
         logger.warning("No records found in event")
         return {"status": "no_records"}
 
     processed_count = 0
     failed_count = 0
 
-    for record in records:
+    for record in event.Records:
         try:
             # SQS body is the job_id
-            job_id = record.get("body")
+            job_id = record.body
             if not job_id:
                 logger.warning(f"Record has no body: {record}")
                 continue
