@@ -1,21 +1,33 @@
 volumes:
-  fastapijobquetemplate-sqs-python-packages:
+  backend-python-packages:
+  worker-python-packages:
 
 services:
-  fastapijobquetemplate-sqs:
+  backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.dev
     volumes:
-      - ./app:/app
-      - fastapijobquetemplate-sqs-python-packages:/app/.venv
+      - ./backend/app:/app
+      - ./common:/app/common
+      - backend-python-packages:/app/.venv
     ports:
       - "8080:8080"
-    environment:
-      - AWS_ENDPOINT_URL=http://localstack:4566
-      - AWS_DEFAULT_REGION=ap-northeast-1
-      - TABLE_NAME=Jobs
-      - QUEUE_NAME=job-queue
+    depends_on:
+      - localstack
+    networks:
+      - app-network
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./worker/app:/app
+      - ./common:/app/common
+      - worker-python-packages:/app/.venv
+    ports:
+      - "8081:8080"
     depends_on:
       - localstack
     networks:
@@ -31,10 +43,10 @@ services:
       - DEBUG=1
       - AWS_DEFAULT_REGION=ap-northeast-1
       - DOCKER_HOST=unix:///var/run/docker.sock
-      # Lambda起動時にホストの ./app を /var/task/app にマウントする
-      - LAMBDA_DOCKER_FLAGS=-v ${PWD}/app:/var/task/app
+      # 【重要】LambdaコンテナをこのComposeのネットワークに参加させる
+      - LAMBDA_DOCKER_NETWORK=app-network
     volumes:
-      # Docker in Docker (Lambdaコンテナ起動用)
+      # Docker in Docker (Lambda起動用)
       - "/var/run/docker.sock:/var/run/docker.sock"
       # 初期化スクリプト
       - "./init_aws.sh:/etc/localstack/init/ready.d/init_aws.sh"
@@ -44,3 +56,4 @@ services:
 networks:
   app-network:
     driver: bridge
+    name: app-network
