@@ -1,24 +1,3 @@
-[](file:///home/kousei/WebDev/FastapiJobQueTemplate-SQS/common/domain/job_a/job_schemas.py) の読み取り
-
-[](file:///home/kousei/WebDev/FastapiJobQueTemplate-SQS/worker/app/src/domain/job_a/service.py) の読み取り
-
-[](file:///home/kousei/WebDev/FastapiJobQueTemplate-SQS/backend/app/src/domain/api_a/schemas.py) の読み取り
-
-[](file:///home/kousei/WebDev/FastapiJobQueTemplate-SQS/common/domain/job_b/job_schemas.py) の読み取り
-
-[](file:///home/kousei/WebDev/FastapiJobQueTemplate-SQS/worker/app/src/domain/job_b/service.py) の読み取り
-
-[](file:///home/kousei/WebDev/FastapiJobQueTemplate-SQS/backend/app/src/domain/api_b/schemas.py) の読み取り
-
-[](file:///home/kousei/WebDev/FastapiJobQueTemplate-SQS/common/domain/job_c/job_schemas.py) の読み取り
-
-[](file:///home/kousei/WebDev/FastapiJobQueTemplate-SQS/worker/app/src/domain/job_c/service.py) の読み取り
-
-[](file:///home/kousei/WebDev/FastapiJobQueTemplate-SQS/backend/app/src/domain/api_c/schemas.py) の読み取り
-
-このリポジトリには現在、以下の3つのサンプルジョブが実装されています。
-それぞれの役割と、API(入力)・Worker(内部処理)・Result(出力)の関係を整理します。
-
 ### 1. Job A: テキスト処理 (Message Processing)
 
 最も基本的な「文字列を受け取って加工して返す」ジョブのサンプルです。
